@@ -197,14 +197,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-self.addEventListener('install', event => {
-  console.log('Service Worker instalado');
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(fetch(event.request));
-});
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function() {
+  navigator.serviceWorker.register('/sw.js')
+    .then(function(reg) {
+    reg.onupdatefound = function() {
+      var installingWorker = reg.installing;
+      installingWorker.onstatechange = function() {
+      if (installingWorker.state === 'installed') {
+        window.dispatchEvent(new Event('swUpdate'))
+      }
+      }
+    }
+    })
+    .catch(function(err) { console.error('service worker error', err) });
+  });
+}
 </script>
 </body>
 </html>
