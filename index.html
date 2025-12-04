@@ -197,13 +197,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-    if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.log('Error SW:', err));
-    });
-    }
+self.addEventListener('install', event => {
+  console.log('Service Worker instalado');
+  self.skipWaiting();
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(fetch(event.request));
+});
 </script>
 </body>
 </html>
