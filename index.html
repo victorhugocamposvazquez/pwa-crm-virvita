@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteca de Sitios Web</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#332f5d">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #f8f8fb;
+    color: #332f5d;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#listView {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+.header-title img {
+    max-width: 40px;
+    text-align: center;
+    max-height: 26px;
+    height: 26px;
+}
+.header {
+    border-bottom: 1px solid #eae9e9;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    width: 100%;
+}
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-title { text-align: center; }
+.header-title h1 { font-size: 1.125rem; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; }
+
+.container {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.container-inner {
+    max-width: 1200px;
+    width: 100%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pdf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+}
+.pdf-card {
+    background: #ffffff;
+    border: 1px solid #e8e6f0;
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+.pdf-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: #332f5d;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+.pdf-card:hover::before { transform: scaleX(1); }
+.pdf-card:hover { transform: translateY(-1px); border-color: #d0cde0; box-shadow: 0 4px 12px rgba(51, 47, 93, 0.08); }
+.pdf-card:active { transform: scale(0.98); }
+
+.pdf-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+}
+.pdf-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease; }
+.pdf-card:hover .pdf-icon { transform: translateX(2px); }
+.pdf-icon svg { width: 24px; height: 24px; color: #332f5d; stroke-width: 1.5; }
+
+.pdf-card h3 { font-size: 0.9375rem; font-weight: 600; color: #332f5d; line-height: 1.35; letter-spacing: -0.01em; }
+.pdf-card p { font-size: 0.8125rem; color: #6b6890; line-height: 1.5; margin-top: 0.125rem; }
+
+.empty-state { text-align: center; padding: 4rem 1.5rem; }
+.empty-state svg { width: 60px; height: 60px; color: #c5c3d6; margin: 0 auto 1.5rem; stroke-width: 1.5; }
+.empty-state h2 { font-size: 1.125rem; font-weight: 600; color: #332f5d; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+.empty-state p { color: #6b6890; font-size: 0.875rem; }
+
+@media (max-width: 600px) { .pdf-grid { grid-template-columns: 1fr; } }
+@media (min-width: 601px) and (max-width: 1024px) { .pdf-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
+</style>
+</head>
+<body>
+<div id="listView">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title"><h1>Biblioteca de Sitios Web</h1></div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="container-inner">
+            <div class="pdf-grid" id="pdfGrid"></div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <h2>No hay sitios</h2>
+                <p>Agrega enlaces para comenzar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const websites = [
+        { id: "1", title: "CRM Virvita comerciales", url: "https://crm.ilustracioneslarum.com/" },
+        { id: "2", title: "CRM Larum", url: "https://crm.ilustracioneslarum.com/" }
+    ];
+
+    const grid = document.getElementById('pdfGrid');
+    const emptyState = document.getElementById('emptyState');
+
+    function renderWebsites() {
+        if (websites.length === 0) {
+            grid.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+        grid.innerHTML = websites.map(site => `
+            <div class="pdf-card" data-id="${site.id}">
+                <div class="pdf-card-content">
+                    <div class="pdf-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>${site.title}</h3>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Agregar evento click
+        document.querySelectorAll('.pdf-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const site = websites.find(s => s.id === card.dataset.id);
+                if (!site) return;
+                window.open(site.url, '_blank'); // abrir en navegador externo
+            });
+        });
+    }
+
+    renderWebsites();
+});
+</script>
+</body>
+</html>
